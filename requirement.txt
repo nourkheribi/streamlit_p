@@ -1,5 +1,5 @@
-streamlit
-joblib
-gdown
-pandas
-scikit-learn
+joblib==1.2.0      # Ensure you're using a compatible version of joblib
+gdown==4.7.0       # Ensure you're using a compatible version of gdown
+pandas==2.0.1      # Ensure you're using a compatible version of pandas
+scikit-learn==1.2.2  # Ensure compatibility with your machine learning code
+streamlit==1.16.0  # Ensure compatibility with your Streamlit app
