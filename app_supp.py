@@ -11,13 +11,13 @@ st.set_page_config(page_title="Supplement Sales - Revenue Predictor", layout="ce
 
 # === 1. Chargement du modèle ===
 def charger_modele():
-    model_path = "models/rf2.pkl"
+    model_path = "models/rf2.joblib"
     os.makedirs("models", exist_ok=True)
 
     if not os.path.exists(model_path):
         try:
             st.sidebar.warning("⚠ Téléchargement du modèle...")
-            url = "https://drive.google.com/file/d/1Sb09PbTmCrZXFHudEMrp85tyzmEBFcLf/view?usp=sharing"  # Direct download URL
+            url = "https://drive.google.com/file/d/1N5YXrUmStS3cmocrPcVs-WK7wFknEaRh/view?usp=sharing"  # Direct download URL
             gdown.download(url, model_path, quiet=False)
             st.sidebar.success("✅ Modèle téléchargé !")
         except Exception as e:
