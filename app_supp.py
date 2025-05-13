@@ -11,26 +11,27 @@ st.set_page_config(page_title="Supplement Sales - Revenue Predictor", layout="ce
 
 # === 1. Chargement du modèle ===
 def charger_modele():
-    model_path = "models/rf2.joblib"
-    os.makedirs("models", exist_ok=True)
+    model_path = "models/rf2.joblib"  # Ensure this is the correct path
+    os.makedirs("models", exist_ok=True)  # Create the 'models' folder if it doesn't exist
 
-    if not os.path.exists(model_path):
+    if not os.path.exists(model_path):  # Check if model is already downloaded
         try:
             st.sidebar.warning("⚠ Téléchargement du modèle...")
-            url = "https://drive.google.com/file/d/1N5YXrUmStS3cmocrPcVs-WK7wFknEaRh/view?usp=sharing"  # Direct download URL
+            url = "https://drive.google.com/uc?id=1N5YXrUmStS3cmocrPcVs-WK7wFknEaRh"  # Correct direct URL for gdown
             gdown.download(url, model_path, quiet=False)
             st.sidebar.success("✅ Modèle téléchargé !")
         except Exception as e:
             st.sidebar.error(f"❌ Échec du téléchargement : {str(e)}")
-            st.stop()
+            st.stop()  # Stop the app if there's an error during download
 
     try:
+        # Load the model after download or if already present
         model = joblib.load(model_path)
         st.sidebar.success("✅ Modèle chargé avec succès")
         return model
     except Exception as e:
         st.sidebar.error(f"❌ Erreur de chargement : {str(e)}")
-        st.stop()
+        st.stop()  # Stop the app if loading the model fails
 
 # === Charger le modèle ===
 modele = charger_modele()
