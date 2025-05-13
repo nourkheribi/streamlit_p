@@ -10,13 +10,13 @@ st.set_page_config(page_title="Supplement Sales - Revenue Predictor", layout="ce
 
 # === Model Loading Function ===
 def charger_modele_depuis_zip():
-    zip_path = "model_rf2.zip"
+    zip_path = "rf2.zip"
     model_path = "models/rf2.joblib"
     os.makedirs("models", exist_ok=True)
 
     if not os.path.exists(model_path):
         if not os.path.exists(zip_path):
-            st.sidebar.error("❌ Le fichier 'model_rf2.zip' est manquant.")
+            st.sidebar.error("❌ Le fichier 'rf2.zip' est manquant.")
             st.stop()
 
         try:
