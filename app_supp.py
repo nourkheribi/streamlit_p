@@ -1,15 +1,14 @@
 import streamlit as st
 import joblib
-import numpy as np
-import pandas as pd
 import os
 import gdown
+import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-# ✅ Configure la page
+# ✅ Configure the page layout
 st.set_page_config(page_title="Supplement Sales - Revenue Predictor", layout="centered")
 
-# === 1. Chargement du modèle ===
+# === 1. Model Loading Function ===
 def charger_modele():
     model_path = "models/rf2.joblib"  # Ensure this is the correct path
     os.makedirs("models", exist_ok=True)  # Create the 'models' folder if it doesn't exist
@@ -17,7 +16,7 @@ def charger_modele():
     if not os.path.exists(model_path):  # Check if model is already downloaded
         try:
             st.sidebar.warning("⚠ Téléchargement du modèle...")
-            url = "https://drive.google.com/file/d/1N5YXrUmStS3cmocrPcVs-WK7wFknEaRh/view?usp=sharing"  # Correct direct URL for gdown
+            url = "https://drive.google.com/uc?id=1N5YXrUmStS3cmocrPcVs-WK7wFknEaRh"  # Correct direct URL for gdown
             gdown.download(url, model_path, quiet=False)
             st.sidebar.success("✅ Modèle téléchargé !")
         except Exception as e:
@@ -33,10 +32,10 @@ def charger_modele():
         st.sidebar.error(f"❌ Erreur de chargement : {str(e)}")
         st.stop()  # Stop the app if loading the model fails
 
-# === Charger le modèle ===
+# === Load the model ===
 modele = charger_modele()
 
-# === Interface Utilisateur ===
+# === User Interface ===
 st.title("💊 Supplement Sales - Revenue Predictor")
 st.write("Let's see how much 💸 your product makes!")
 
@@ -55,7 +54,7 @@ category_map = {'Protein': 0, 'Vitamin': 1, 'Omega': 2, 'Performance': 3, 'Amino
 location_map = {'Canada': 0, 'UK': 1, 'USA': 2}
 platform_map = {'Amazon': 0, 'Walmart': 1, 'iHerb': 2}
 
-# === DataFrame ===
+# === Create DataFrame ===
 input_data = pd.DataFrame({
     'Category': [category_map[Category]],
     'Units Sold': [Units_Sold],
@@ -66,11 +65,11 @@ input_data = pd.DataFrame({
     'Platform': [platform_map[platforme]]
 })
 
-# === Standardisation ===
+# === Standardization ===
 scaler = StandardScaler()
 input_data[['Units Sold', 'Price', 'Discount']] = scaler.fit_transform(input_data[['Units Sold', 'Price', 'Discount']])
 
-# === Prédiction ===
+# === Prediction ===
 if st.button('Predict'):
     prediction = modele.predict(input_data)[0]
     st.success(f'The predicted revenue is: ${prediction:.2f}')
