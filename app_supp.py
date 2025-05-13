@@ -14,11 +14,13 @@ def charger_modele_depuis_zip():
     model_path = "models/rf2.joblib"
     os.makedirs("models", exist_ok=True)
 
+    # Vérifier si le modèle est déjà extrait
     if not os.path.exists(model_path):
         if not os.path.exists(zip_path):
             st.sidebar.error("❌ Le fichier 'rf2.zip' est manquant.")
             st.stop()
 
+        # Extraction du fichier zip
         try:
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                 zip_ref.extractall("models")
@@ -27,6 +29,7 @@ def charger_modele_depuis_zip():
             st.sidebar.error(f"❌ Erreur lors de l'extraction : {str(e)}")
             st.stop()
 
+    # Charger le modèle avec gestion des erreurs
     try:
         modele = joblib.load(model_path)
         st.sidebar.success("✅ Modèle chargé avec succès")
@@ -73,7 +76,12 @@ input_data = pd.DataFrame({
     'Platform': [platform_map[platforme]]
 })
 
+# === Vérification des données d'entrée ===
+st.write("Données d'entrée :")
+st.write(input_data)
+
 # === Standardization ===
+# Il est préférable de charger un scaler déjà entraîné plutôt que de le refaire ici
 scaler = StandardScaler()
 input_data[['Units Sold', 'Price', 'Discount']] = scaler.fit_transform(
     input_data[['Units Sold', 'Price', 'Discount']]
@@ -82,6 +90,7 @@ input_data[['Units Sold', 'Price', 'Discount']] = scaler.fit_transform(
 # === Prediction ===
 if st.button('Predict'):
     try:
+        # Assurez-vous que les données sont dans le bon format
         prediction = modele.predict(input_data)[0]
         st.success(f'The predicted revenue is: ${prediction:.2f}')
     except Exception as e:
