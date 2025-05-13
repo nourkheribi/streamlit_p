@@ -40,10 +40,13 @@ modele = charger_modele_depuis_zip()
 
 # === User Interface ===
 st.title("💊 Supplement Sales - Revenue Predictor")
-st.write("Let's see how much 💸 your product makes!")
+st.write("Let’s see how much 💸 your product makes!")
 
 # === Inputs ===
-Category = st.selectbox('Product Category', ['Protein', 'Vitamin', 'Omega', 'Performance', 'Amino Acid', 'Mineral', 'Herbal', 'Sleep Aid', 'Fat Burner', 'Hydration'])
+Category = st.selectbox('Product Category', [
+    'Protein', 'Vitamin', 'Omega', 'Performance', 'Amino Acid',
+    'Mineral', 'Herbal', 'Sleep Aid', 'Fat Burner', 'Hydration'
+])
 Units_Sold = st.number_input('Units Sold', min_value=0)
 prix = st.number_input('Price ($)', min_value=0.0)
 pourcentage_reduction = st.number_input('Discount Percentage (%)', min_value=0.0)
@@ -78,5 +81,8 @@ input_data[['Units Sold', 'Price', 'Discount']] = scaler.fit_transform(
 
 # === Prediction ===
 if st.button('Predict'):
-    prediction = modele.predict(input_data)[0]
-    st.success(f'The predicted revenue is: ${prediction:.2f}')
+    try:
+        prediction = modele.predict(input_data)[0]
+        st.success(f'The predicted revenue is: ${prediction:.2f}')
+    except Exception as e:
+        st.error(f"❌ Prediction failed: {e}")
