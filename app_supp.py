@@ -1,32 +1,45 @@
 import streamlit as st
-import pandas as pd
 import joblib
-import requests
+import numpy as np
+import pandas as pd
 import os
+import gdown
 from sklearn.preprocessing import StandardScaler
 
-# Fonction pour télécharger depuis Google Drive
-def download_file_from_google_drive(share_url, output_filename):
-    file_id = share_url.split('/d/')[1].split('/')[0]
-    download_url = f'https://drive.google.com/file/d/1QOJXKCUxuNcpmIsZ_eEtUmyVqFpKdZD9/view?usp=sharing'
-    response = requests.get(download_url)
-    with open(output_filename, 'wb') as f:
-        f.write(response.content)
+# ✅ Configure la page
+st.set_page_config(page_title="Supplement Sales - Revenue Predictor", layout="centered")
 
-# Télécharger le modèle depuis Drive (⚠️ Remplace le lien par celui du vrai .pkl)
-drive_link = 'TON_LIEN_ICI'
-model_path = 'rf2.pkl'
-if not os.path.exists(model_path):
-    download_file_from_google_drive(drive_link, model_path)
+# === 1. Chargement du modèle ===
+def charger_modele():
+    model_path = "models/rf2.pkl"
+    os.makedirs("models", exist_ok=True)
 
-# Charger le modèle
-model = joblib.load(model_path)
+    if not os.path.exists(model_path):
+        try:
+            st.sidebar.warning("⚠ Téléchargement du modèle...")
+            url = "https://drive.google.com/file/d/1QOJXKCUxuNcpmIsZ_eEtUmyVqFpKdZD9/view?usp=sharing"
+            gdown.download(url, model_path, quiet=False)
+            st.sidebar.success("✅ Modèle téléchargé !")
+        except Exception as e:
+            st.sidebar.error(f"❌ Échec du téléchargement : {str(e)}")
+            st.stop()
 
-# Interface Streamlit
+    try:
+        model = joblib.load(model_path)
+        st.sidebar.success("✅ Modèle chargé avec succès")
+        return model
+    except Exception as e:
+        st.sidebar.error(f"❌ Erreur de chargement : {str(e)}")
+        st.stop()
+
+# === Charger le modèle ===
+modele = charger_modele()
+
+# === Interface Utilisateur ===
 st.title("💊 Supplement Sales - Revenue Predictor")
 st.write("Let's see how much 💸 your product makes!")
 
-# Inputs
+# === Inputs ===
 Category = st.selectbox('Product Category', ['Protein', 'Vitamin', 'Omega', 'Performance', 'Amino Acid', 'Mineral', 'Herbal', 'Sleep Aid', 'Fat Burner', 'Hydration'])
 Units_Sold = st.number_input('Units Sold', min_value=0)
 prix = st.number_input('Price ($)', min_value=0.0)
@@ -35,13 +48,13 @@ unites_retournees = st.number_input('Units Returned', min_value=0.0)
 Location = st.selectbox('Location', ['Canada', 'UK', 'USA'])
 platforme = st.selectbox('Platform', ['Amazon', 'Walmart', 'iHerb'])
 
-# Mapping
+# === Mapping ===
 category_map = {'Protein': 0, 'Vitamin': 1, 'Omega': 2, 'Performance': 3, 'Amino Acid': 4,
                 'Mineral': 5, 'Herbal': 6, 'Sleep Aid': 7, 'Fat Burner': 8, 'Hydration': 9}
 location_map = {'Canada': 0, 'UK': 1, 'USA': 2}
 platform_map = {'Amazon': 0, 'Walmart': 1, 'iHerb': 2}
 
-# Data preparation
+# === DataFrame ===
 input_data = pd.DataFrame({
     'Category': [category_map[Category]],
     'Units Sold': [Units_Sold],
@@ -52,11 +65,11 @@ input_data = pd.DataFrame({
     'Platform': [platform_map[platforme]]
 })
 
-# Standardisation
+# === Standardisation ===
 scaler = StandardScaler()
 input_data[['Units Sold', 'Price', 'Discount']] = scaler.fit_transform(input_data[['Units Sold', 'Price', 'Discount']])
 
-# Prediction
+# === Prédiction ===
 if st.button('Predict'):
-    prediction = model.predict(input_data)[0]
+    prediction = modele.predict(input_data)[0]
     st.success(f'The predicted revenue is: ${prediction:.2f}')
